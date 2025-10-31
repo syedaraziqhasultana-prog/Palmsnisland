@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Table Reservations</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f8f9fa; color: #343a40; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #333399; /* Matching the orders admin page */
+            color: white;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #f1f3f5;
+        }
+        #loading, #empty-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-top: 40px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="admin.html" class="back-btn">&larr; Back to Dashboard</a>
+        <h1>Table Reservations</h1>
+
+        <div id="loading">Loading reservations...</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Received At</th>
+                </tr>
+            </thead>
+            <tbody id="reservations-table-body">
+                <!-- Reservation data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        <div id="empty-message" style="display: none;">No reservations found.</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('reservations-table-body');
+            const loadingIndicator = document.getElementById('loading');
+            const emptyMessage = document.getElementById('empty-message');
+            const apiUrl = 'http://localhost:3000/api/reservations';
+
+            try {
+                const response = await fetch(apiUrl);
+                const reservations = await response.json();
+                loadingIndicator.style.display = 'none';
+
+                if (reservations.length === 0) {
+                    emptyMessage.style.display = 'block';
+                    return;
+                }
+
+                reservations.forEach(res => {
+                    // Create a new row at the end of the table
+                    const row = tableBody.insertRow();
+
+                    // To avoid timezone issues, parse the date string manually.
+                    // The input 'YYYY-MM-DD' can be interpreted as UTC, causing off-by-one day errors.
+                    const dateParts = res.date ? res.date.split('-') : [];
+                    const reservationDate = dateParts.length === 3 
+                        ? new Date(dateParts[0], dateParts[1] - 1, dateParts[2])
+                        : null;
+                    const formattedReservationDate = reservationDate ? reservationDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+
+                    // Format the server timestamp for better readability
+                    const receivedAtDate = res.receivedAt ? new Date(res.receivedAt) : null;
+                    const formattedReceivedAt = receivedAtDate ? receivedAtDate.toLocaleString('en-US') : 'N/A';
+
+                    row.innerHTML = `
+                        <td>${res.name || 'N/A'}</td>
+                        <td>${res.email || 'N/A'}</td>
+                        <td>${res.phone || 'N/A'}</td>
+                        <td>${formattedReservationDate}</td>
+                        <td>${res.time || 'N/A'}</td>
+                        <td>${formattedReceivedAt}</td>
+                    `;
+                });
+
+            } catch (error) {
+                console.error('Error fetching reservations:', error);
+                loadingIndicator.textContent = 'Failed to load reservations. Please ensure the server is running.';
+                loadingIndicator.style.color = 'red';
+            }
+        });
+    </script>
+
+</body>
+</html>

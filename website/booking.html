@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Your Order</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            /* Vibrant, animated gradient for a "Gen Z" feel */
+            background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 400;
+            font-size: 1.1em;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #444;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(50, 50, 50, 0.2);
+            background: rgba(255, 255, 255, 0.4);
+            color: #333;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(50, 50, 50, 0.5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #ff00cc;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background: #e600b8;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 450px;
+            text-align: left;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .modal-content p {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        .modal-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal-buttons button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Place Your Order</h1>
+        <h2 id="booking-item-name">Loading item...</h2>
+        <form id="booking-form">
+            <input type="hidden" id="menu-item" name="menu-item" value="">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="table-no">Table No.</label>
+                <input type="text" id="table-no" name="table-no" placeholder="e.g., 12 or 'Patio'" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" required value="1" min="1">
+            </div>
+            <button type="submit" class="submit-btn">Confirm Order</button>
+        </form>
+    </div>
+
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Please Confirm Your Order</h3>
+            <p id="confirmation-details"></p>
+            <div class="modal-buttons">
+                <button id="cancel-btn" style="background-color: #6c757d;">Edit</button>
+                <button id="confirm-btn">Confirm & Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const params = new URLSearchParams(window.location.search);
+            const itemName = params.get('item');
+
+            if (itemName) {
+                const decodedItemName = decodeURIComponent(itemName);
+                $('#booking-item-name').text(`Ordering: ${decodedItemName}`);
+                $('#menu-item').val(decodedItemName);
+            } else {
+                $('#booking-item-name').text('No item selected');
+                // Disable form if no item is selected
+                $('#booking-form button').prop('disabled', true);
+            }
+
+            const modal = $('#confirmation-modal');
+            const confirmBtn = $('#confirm-btn');
+            const cancelBtn = $('#cancel-btn');
+            let formData = {};
+
+            $('#booking-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                formData = {
+                    name: $('#name').val(),
+                    tableNo: $('#table-no').val(),
+                    menuItem: $('#menu-item').val(),
+                    quantity: $('#quantity').val()
+                };
+
+                $('#confirmation-details').html(
+                    `<strong>Item:</strong> ${formData.menuItem}<br>` +
+                    `<strong>Name:</strong> ${formData.name}<br>` +
+                    `<strong>Table No.:</strong> ${formData.tableNo}<br>` +
+                    `<strong>Quantity:</strong> ${formData.quantity}`
+                );
+
+                modal.css('display', 'flex');
+            });
+
+            cancelBtn.on('click', function() {
+                modal.hide();
+            });
+
+            confirmBtn.on('click', async function() {
+                $(this).prop('disabled', true).text('Placing Order...');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/reservations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || `Server responded with status: ${response.status}`);
+                    }
+
+                    modal.hide();
+                    alert('Your order has been placed successfully!');
+                    $('#booking-form')[0].reset();
+                } catch (error) {
+                    console.error('Error submitting order:', error);
+                    alert(`There was an error placing your order: ${error.message}`);
+                } finally {
+                    $(this).prop('disabled', false).text('Confirm & Place Order');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

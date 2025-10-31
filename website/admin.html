@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root{ --glass-bg: rgba(255,255,255,0.07); --muted: rgba(255,255,255,0.85); --accent1:#ff9ac2; --accent2:#ff69b4; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: linear-gradient(135deg,#143b6f 0%, #5b247a 50%, #ff69b4 100%); color: var(--muted); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px 16px; }
+        /* subtle decorative radial */
+        body::before{ content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03), transparent 8%), radial-gradient(circle at 85% 80%, rgba(0,0,0,0.06), transparent 18%); pointer-events:none; }
+        .container { max-width: 820px; text-align: center; background: var(--glass-bg); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px) saturate(120%); -webkit-backdrop-filter: blur(10px) saturate(120%); padding: 28px 28px; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+        h1 { color: #fff; margin-bottom: 8px; font-size: 1.9em; letter-spacing: 0.6px; }
+        .welcome-message { font-size: 1.05em; color: rgba(255,255,255,0.92); margin-top: 0; margin-bottom: 26px; }
+        .dashboard-links { display: flex; flex-wrap: wrap; gap: 22px; justify-content: center; }
+        .dashboard-link { display: block; padding: 18px 34px; color: #fff; text-decoration: none; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.25); font-size: 1.15em; font-weight: 700; transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.2s; min-width: 220px; text-align:center; }
+        .dashboard-link:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 18px 40px rgba(0,0,0,0.35); }
+        .reservations-link { background: linear-gradient(135deg, rgba(102,126,234,0.95), rgba(118,75,162,0.95)); }
+        .orders-link { background: linear-gradient(135deg, rgba(254,107,139,0.95), rgba(255,142,83,0.95)); }
+        .logout-btn { display: inline-block; margin-top: 28px; padding: 10px 26px; background: linear-gradient(135deg,var(--accent1),var(--accent2)); color: white; text-decoration: none; border-radius: 999px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(255,105,180,0.16); transition: transform 0.18s ease, box-shadow 0.18s ease; }
+        .logout-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 34px rgba(255,105,180,0.22); }
+        @media (max-width:600px){ .dashboard-link{min-width:unset;width:100%; padding:14px 18px;font-size:1.05em;} .container{padding:20px;} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Syeda Raaz [Admin] Dashboard</h1>
+        <p class="welcome-message">Welcome, Syeda Raaz!</p>
+        <div class="dashboard-links">
+            <a href="reservations.html" class="dashboard-link reservations-link" target="_blank">Table Reservations</a>
+            <a href="customer-orders.html" class="dashboard-link orders-link" target="_blank">Live Customer Orders</a>
+        </div>
+        <a href="#" onclick="logoutAdmin(event)" class="logout-btn">Log Out</a>
+    </div>
+    <script>
+        function logoutAdmin(event) {
+            event.preventDefault(); // Prevent the link from trying to navigate
+            alert('Syeda your information is safe with us!you have been Successfully logged out. Thank you!');
+            window.close();
+        }
+    </script>
+</body>
+</html>
